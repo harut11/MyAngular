@@ -1,0 +1,3 @@
+APP.controller('HomeIndexController', function() {
+
+});

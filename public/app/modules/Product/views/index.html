@@ -1,0 +1,30 @@
+<div class="bg-white p-5">
+    <h2 class="mb-5">
+        All Products
+        <a class="btn btn-warning" ui-sref="products.edit({id : 0})">Create +</a>
+    </h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col" width="20%">Name</th>
+            <th scope="col" width="20%">Short Descr.</th>
+            <th scope="col" width="20%">Price</th>
+            <th scope="col" class="text-right">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="product in products">
+            <th scope="row">{{ product.id }}</th>
+            <td>{{ product.name }}</td>
+            <td>{{ product.short_description.substr(0, 10) }}</td>
+            <td>{{ product.price }}</td>
+            <td class="text-right">
+                <a class="btn btn-danger" ui-sref="products.delete({id : product.id})">DELETE</a>
+                <a class="btn btn-success" ui-sref="products.edit({id : product.id})">EDIT</a>
+                <a class="btn btn-info" ui-sref="products.show({slug : product.slug})">SHOW</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

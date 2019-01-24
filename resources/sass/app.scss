@@ -1,0 +1,25 @@
+
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+// Toastr
+@import '~angular-toastr/dist/angular-toastr.css';
+
+.toast-error{
+  background-color: #BD362F !important;
+}
+
+.toast-success{
+  background-color: #51A351 !important;
+}
+
+.navbar-laravel {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
