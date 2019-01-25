@@ -94,6 +94,9 @@ APP.factory('ProductService', ['$resource', function ($resource) {
     get: {
       method: 'GET'
     },
+    edit: {
+      method: 'GET'
+    },
     update: {
       method: 'PUT'
     },
