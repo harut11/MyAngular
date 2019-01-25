@@ -63,24 +63,45 @@ class ProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  str  $slug
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($slug)
     {
-        //
+        $product = Product::query()
+            ->select('*')
+            ->where(['category'])
+            ->whereSlug($slug)
+            ->first();
+
+        return response()->json(['product' => $product]);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  str  $slug
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $slug)
     {
-        //
+        $this->validate($request, [
+            'name' => 'required|string|min:5|max:60',
+            'description' => 'required|string|min:10|max:200',
+            'price' => 'number|min:1|max:20'
+        ]);
+
+        $product = Product()::query()
+            ->select('*')
+            ->whereSlug($slug)
+            ->first();
+
+        $product->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'price' => $request->price
+        ]);
     }
 
     /**

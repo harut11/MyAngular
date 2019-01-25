@@ -14,10 +14,18 @@ APP.controller('ProductShowController', function($scope, ProductService, $stateP
 	})
 });
 
-APP.controller('ProductEditController', function() {
-	
+APP.controller('ProductEditController', function($scope, ProductService, $stateParams) {
+	$scope.product = {};
+
+	ProductService.edit({id : $stateParams.slug}, (res) => {
+		$scope.product = res.product;
+	})
 });
 
-APP.controller('ProductDeleteController', function() {
-	
+APP.controller('ProductDeleteController', function($scope, ProductService, $stateParams) {
+	$scope.product = {};
+
+	ProductService.delete({id : $stateParams.slug}, (res) => {
+
+	})
 });

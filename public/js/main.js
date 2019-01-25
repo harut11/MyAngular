@@ -208,8 +208,20 @@ APP.controller('ProductShowController', function ($scope, ProductService, $state
     $scope.product = res.product;
   });
 });
-APP.controller('ProductEditController', function () {});
-APP.controller('ProductDeleteController', function () {});
+APP.controller('ProductEditController', function ($scope, ProductService, $stateParams) {
+  $scope.product = {};
+  ProductService.edit({
+    id: $stateParams.slug
+  }, function (res) {
+    $scope.product = res.product;
+  });
+});
+APP.controller('ProductDeleteController', function ($scope, ProductService, $stateParams) {
+  $scope.product = {};
+  ProductService.delete({
+    id: $stateParams.slug
+  }, function (res) {});
+});
 APP.config(function ($stateProvider) {
   $stateProvider.state('about', {
     url: "/about",
