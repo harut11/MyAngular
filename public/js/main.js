@@ -1,4 +1,4 @@
-var APP = angular.module('app', ['ui.router', 'ngResource', 'ngAnimate', 'toastr', 'angular-jwt']);
+var APP = angular.module('app', ['ui.router', 'ngResource', 'ngAnimate', 'toastr', 'angular-jwt', 'ngFileUpload']);
 APP.config(["$locationProvider", function ($locationProvider) {
   $locationProvider.html5Mode(true);
 }]);
@@ -23,7 +23,7 @@ APP.run(function ($rootScope, $state, authManager, $transitions) {
   authManager.checkAuthOnRefresh();
   authManager.redirectWhenUnauthenticated();
   $rootScope.$on('tokenHasExpired', function () {
-    alert('Your token is expired.');
+    localStorage.removeItem('api_token');
   });
   $transitions.onEnter({}, function (transition, state) {
     if (state.data && state.data.requiresLogin === false) {
@@ -87,9 +87,30 @@ APP.factory('AuthService', ['$resource', function ($resource) {
     }
   });
 }]);
+APP.factory('CategoryService', ['$resource', function ($resource) {
+  return $resource('/api/categories/:slug', {
+    slug: '@slug'
+  }, {
+    get: {
+      method: 'GET'
+    },
+    update: {
+      method: 'PUT'
+    },
+    store: {
+      method: 'POST'
+    },
+    show: {
+      method: 'GET'
+    },
+    delete: {
+      method: 'DELETE'
+    }
+  });
+}]);
 APP.factory('ProductService', ['$resource', function ($resource) {
-  return $resource('/api/products/:id', {
-    id: '@id'
+  return $resource('/api/products/:slug', {
+    slug: '@slug'
   }, {
     get: {
       method: 'GET'
@@ -112,7 +133,7 @@ APP.factory('ProductService', ['$resource', function ($resource) {
   });
 }]);
 APP.controller('HeaderController', function ($scope, $state, authManager) {
-  $scope.logout = function (event) {
+  $scope.logout = function ($event) {
     $event.preventDefault();
     localStorage.removeItem('api_token');
     authManager.unauthenticate();
@@ -206,24 +227,68 @@ APP.controller('ProductIndexController', function ($scope, ProductService) {
 APP.controller('ProductShowController', function ($scope, ProductService, $stateParams) {
   $scope.product = {};
   ProductService.show({
-    id: $stateParams.slug
+    slug: $stateParams.slug
   }, function (res) {
     $scope.product = res.product;
   });
 });
-APP.controller('ProductEditController', function ($scope, ProductService, $stateParams) {
-  $scope.product = {};
-  ProductService.edit({
-    id: $stateParams.slug
-  }, function (res) {
-    $scope.product = res.product;
+APP.controller('ProductEditController', function ($scope, ProductService, $stateParams, CategoryService, $state, Upload) {
+  var isEdit = $stateParams.slug != 0;
+  $scope.text = !isEdit ? 'Create ' : 'edit ';
+  $scope.files = [];
+
+  $scope.uploadFiles = function (files) {
+    if (files && files.length) {
+      Upload.upload({
+        url: 'api/products/images',
+        data: {
+          file: files,
+          slug: $stateParams.slug
+        }
+      }).then(function (res) {});
+    }
+  };
+
+  $scope.categories = [];
+  $scope.product = {
+    category_id: ''
+  };
+  CategoryService.get({}, function (res) {
+    $scope.categories = res.categories;
   });
+
+  if (isEdit) {
+    ProductService.show({
+      slug: $stateParams.slug
+    }, function (res) {
+      $scope.product = res.product;
+    });
+  }
+
+  $scope.save = function () {
+    if (isEdit) {
+      $scope.uploadFiles($scope.file);
+      ProductService.update({
+        slug: $stateParams.slug
+      }, $scope.product, function (res) {
+        $state.go('products');
+      });
+    } else {
+      ProductService.store($scope.product, function (res) {
+        $state.go('products');
+      });
+    }
+  };
 });
-APP.controller('ProductDeleteController', function ($scope, ProductService, $stateParams) {
-  $scope.product = {};
-  ProductService.delete({
-    id: $stateParams.slug
-  }, function (res) {});
+APP.controller('ProductDeleteController', function ($scope, ProductService, $stateParams, $state, toastr) {
+  $scope.delete = function () {
+    ProductService.delete({
+      slug: stateParams.slug
+    }, function (res) {
+      $state.go('products');
+      toastr.success('Successfully deleted!');
+    });
+  };
 });
 APP.config(function ($stateProvider) {
   $stateProvider.state('about', {

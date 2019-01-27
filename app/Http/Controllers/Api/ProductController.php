@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\ProductRequest;
+use App\Models\ProductImage;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 
 class ProductController extends Controller
 {
@@ -17,6 +21,7 @@ class ProductController extends Controller
     {
         $data = Product::query()
             ->select('id', 'name', 'slug', 'price', 'short_description')
+            ->orderBy('name', 'ASC')
             ->paginate(20);
 
         return response()->json(['products' => $data]);
@@ -38,9 +43,20 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
-        //
+        $data = $request->only([
+            'name',
+            'short_description',
+            'description',
+            'price',
+            'category_id'
+        ]);
+
+        $data = $data + ['creator_id' => auth()->id()];
+        Product::query()->create($data);
+
+        return response()->json(['message' => 'success'], 201);
     }
 
     /**
@@ -68,13 +84,7 @@ class ProductController extends Controller
      */
     public function edit($slug)
     {
-        $product = Product::query()
-            ->select('*')
-            ->where(['category'])
-            ->whereSlug($slug)
-            ->first();
-
-        return response()->json(['product' => $product]);
+        
     }
 
     /**
@@ -84,24 +94,19 @@ class ProductController extends Controller
      * @param  str  $slug
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $slug)
+    public function update(ProductRequest $request, $slug)
     {
-        $this->validate($request, [
-            'name' => 'required|string|min:5|max:60',
-            'description' => 'required|string|min:10|max:200',
-            'price' => 'number|min:1|max:20'
-        ]);
-
-        $product = Product()::query()
-            ->select('*')
+        Product::query()
             ->whereSlug($slug)
-            ->first();
+            ->update($request->only([
+                'name',
+                'description',
+                'price',
+                'short_description',
+                'category_id'
+            ]));
 
-        $product->update([
-            'name' => $request->name,
-            'description' => $request->description,
-            'price' => $request->price
-        ]);
+        return response()->json(['message' => 'success'], 204);
     }
 
     /**
@@ -110,8 +115,40 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($slug)
     {
-        //
+        Product::query()->whereSlug($slug)->delete();
+
+        return response()->json(['message' => 'seccess'], 204);
+    }
+
+    /**
+     * @param Request $request
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function uploadImages(request $request)
+    {
+        $this->validate($request, [
+            'file' => 'required',
+            'file.*' => 'image',
+            'slug' => 'required|exists:products,slug'
+        ]);
+
+        $files = $request->file('file');
+        $productId = Product::query()->whereSlug($request->slug)->first()->id();
+        foreach ($files as $file) {
+            $img = Image::make($file)->fit(400)->encode('jpg');
+
+            $name = uniqid() . '.jpg';
+            $imageName = '/products/' . $name;
+
+            ProductImage::query()->create([
+                'name' => $name,
+                'product_id' => $productId
+            ]);
+
+            Storage::put('public/' . $imageName, $img->__toString());
+        }
+        return response()->json(['message' => 'success'], 201);
     }
 }

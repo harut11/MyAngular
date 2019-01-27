@@ -6,12 +6,13 @@ APP.controller('AuthLoginController', function ($scope, AuthService, toastr, $st
 
 	$scope.login = function () {
 		AuthService.login($scope.user, (res) => {
-			if (res.access_token) {
+			if(res.access_token) {
 				localStorage.setItem('api_token', res.access_token);
 				$state.go('/');
 			}
+
 		}, (err) => {
-			if (err.status === 401) {
+			if(err.status === 401) {
 				toastr.error('Email or Password incorrect!');
 			}
 		});

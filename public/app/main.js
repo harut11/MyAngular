@@ -1,4 +1,4 @@
-const APP = angular.module('app', ['ui.router', 'ngResource', 'ngAnimate', 'toastr', 'angular-jwt']);
+const APP = angular.module('app', ['ui.router', 'ngResource', 'ngAnimate', 'toastr', 'angular-jwt', 'ngFileUpload']);
 
 APP.config(["$locationProvider", function($locationProvider) {
 	$locationProvider.html5Mode(true);
@@ -29,7 +29,7 @@ APP.run(function ($rootScope, $state, authManager, $transitions) {
 	authManager.redirectWhenUnauthenticated();
 
 	$rootScope.$on('tokenHasExpired', function() {
-        alert('Your token is expired.');
+        localStorage.removeItem('api_token');
     });
 
     $transitions.onEnter({}, function (transition, state) {

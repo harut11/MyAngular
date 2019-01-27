@@ -18,6 +18,7 @@ mix.js('resources/js/app.js', 'public/js')
 		'./node_modules/angular-resource/angular-resource.js',
 		'./node_modules/angular-animate/angular-animate.js',
 		'./node_modules/angular-toastr/dist/angular-toastr.tpls.js',
+		'./node_modules/ng-file-upload/dist/ng-file-upload.js',
 		'./node_modules/angular-jwt/dist/angular-jwt.js',
 	], 'public/js/angular.js')
 	.babel([

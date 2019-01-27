@@ -9,7 +9,7 @@ $factory->define(\App\Models\Product::class, function (Faker $faker) {
         'short_description' => $faker->text(100),
         'description' => $faker->text(500),
         'price' => $faker->randomFloat(1, 0, 10000),
-        'creator_id' => 3,
+        'creator_id' => 1,
         'category_id' => 1,
     ];
 });

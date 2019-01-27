@@ -1,7 +1,7 @@
 <div class="bg-white p-5">
     <h2 class="mb-5">
         All Products
-        <a class="btn btn-warning" ui-sref="products.edit({id : 0})">Create +</a>
+        <a class="btn btn-warning" ui-sref="products.edit({slug : 0})">Create +</a>
     </h2>
     <table class="table">
         <thead>
@@ -20,7 +20,7 @@
             <td>{{ product.short_description.substr(0, 10) }}</td>
             <td>{{ product.price }}</td>
             <td class="text-right">
-                <a class="btn btn-danger" ui-sref="products.delete({id : product.id})">DELETE</a>
+                <a class="btn btn-danger" ui-sref="products.delete({slug : product.slug})">DELETE</a>
                 <a class="btn btn-success" ui-sref="products.edit({slug : product.slug})">EDIT</a>
                 <a class="btn btn-info" ui-sref="products.show({slug : product.slug})">SHOW</a>
             </td>
