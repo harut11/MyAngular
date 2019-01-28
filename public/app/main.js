@@ -26,10 +26,11 @@ APP.config(function Config(toastrConfig, jwtOptionsProvider, $httpProvider) {
 
 APP.run(function ($rootScope, $state, authManager, $transitions) {
 	authManager.checkAuthOnRefresh();
-	authManager.redirectWhenUnauthenticated();
+    authManager.redirectWhenUnauthenticated();
 
 	$rootScope.$on('tokenHasExpired', function() {
         localStorage.removeItem('api_token');
+        alert('Your token is expired.');
     });
 
     $transitions.onEnter({}, function (transition, state) {
@@ -46,16 +47,16 @@ APP.run(function ($rootScope, $state, authManager, $transitions) {
 APP.factory('errorInterceptors', ['$injector', function($injector) {
 	let service = {};
 
-	service.responceError = function(responce) {
-		if (responce.status === 422) {
+	service.responseError = function(response) {
+		if (response.status === 422) {
 			let toastr = $injector.get('toastr');
 			let errorText = '';
 			Object.values(response.data.errors).map(function(item) {
 				errorText += item.join('<br>') + '<br>';
 			});
-			toastr.errors(errorText);
+			toastr.error(errorText);
 		}
-		throw responce;
+		throw response;
 	};
 	return service;
 }]);

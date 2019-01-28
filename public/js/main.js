@@ -24,6 +24,7 @@ APP.run(function ($rootScope, $state, authManager, $transitions) {
   authManager.redirectWhenUnauthenticated();
   $rootScope.$on('tokenHasExpired', function () {
     localStorage.removeItem('api_token');
+    alert('Your token is expired.');
   });
   $transitions.onEnter({}, function (transition, state) {
     if (state.data && state.data.requiresLogin === false) {
@@ -38,8 +39,8 @@ APP.run(function ($rootScope, $state, authManager, $transitions) {
 APP.factory('errorInterceptors', ['$injector', function ($injector) {
   var service = {};
 
-  service.responceError = function (responce) {
-    if (responce.status === 422) {
+  service.responseError = function (response) {
+    if (response.status === 422) {
       var _toastr = $injector.get('toastr');
 
       var errorText = '';
@@ -47,10 +48,10 @@ APP.factory('errorInterceptors', ['$injector', function ($injector) {
         errorText += item.join('<br>') + '<br>';
       });
 
-      _toastr.errors(errorText);
+      _toastr.error(errorText);
     }
 
-    throw responce;
+    throw response;
   };
 
   return service;
@@ -72,18 +73,20 @@ APP.factory('AuthService', ['$resource', function ($resource) {
       method: 'POST',
       skipAuthorization: true
     },
-    verify: {
-      url: '/api/auth/verify',
+    setPassword: {
+      url: '/api/auth/set-password',
       method: 'POST',
       skipAuthorization: true
     },
     reset: {
       url: '/api/auth/reset',
-      method: 'POST'
+      method: 'POST',
+      skipAuthorization: true
     },
-    setPassword: {
-      url: '/api/auth/set-password',
-      method: 'POST'
+    verify: {
+      url: '/api/auth/verify',
+      method: 'POST',
+      skipAuthorization: true
     }
   });
 }]);

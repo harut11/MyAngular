@@ -38,7 +38,7 @@ APP.controller('AuthForgotController', function($scope, AuthService, toastr) {
 	$scope.email = null;
 
 	$scope.reset = function() {
-		AuthService.reset({emial: $scope.email}, (res) => {
+		AuthService.reset({email: $scope.email}, (res) => {
 			$scope.email = null;
 			toastr.success('Please check your email.');
 		}, (err) => console.log(err));
