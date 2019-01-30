@@ -27,4 +27,17 @@
         </tr>
         </tbody>
     </table>
+
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item"
+                ng-repeat="(key, page) in pagination.last_page track by key"
+                ng-class='(key + 1) == pagination.currentPage ? "active" : "" '
+            >
+                <a class="page-link ac"
+                   href="#"
+                   ng-click="getProducts((key + 1))">{{key + 1}}</a>
+            </li>
+        </ul>
+    </nav>
 </div>

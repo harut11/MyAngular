@@ -1,7 +1,4 @@
 var APP = angular.module('app', ['ui.router', 'ngResource', 'ngAnimate', 'toastr', 'angular-jwt', 'ngFileUpload']);
-APP.config(["$locationProvider", function ($locationProvider) {
-  $locationProvider.html5Mode(true);
-}]);
 APP.config(function Config(toastrConfig, jwtOptionsProvider, $httpProvider) {
   angular.extend(toastrConfig, {
     allowHtml: true,
@@ -157,7 +154,7 @@ APP.controller('AuthLoginController', function ($scope, AuthService, toastr, $st
       }
     }, function (err) {
       if (err.status === 401) {
-        toastr.error('Email or Password incorrect!');
+        toastr.error('Email or Password incorrect.');
       }
     });
   };
@@ -182,7 +179,7 @@ APP.controller('AuthForgotController', function ($scope, AuthService, toastr) {
 
   $scope.reset = function () {
     AuthService.reset({
-      emial: $scope.email
+      email: $scope.email
     }, function (res) {
       $scope.email = null;
       toastr.success('Please check your email.');
@@ -212,7 +209,7 @@ APP.controller('AuthVerifyController', function ($stateParams, AuthService, toas
   AuthService.verify({
     token: $stateParams.token
   }, function () {
-    toastr.success('You have successfuly verified!');
+    toastr.success('You have successfully verified.');
     $state.go('login');
   }, function (err) {
     $state.go('/');
@@ -221,11 +218,21 @@ APP.controller('AuthVerifyController', function ($stateParams, AuthService, toas
 APP.controller('HomeIndexController', function () {});
 APP.controller('ProductIndexController', function ($scope, ProductService) {
   $scope.products = [];
-  ProductService.get({
-    page: 1
-  }, function (res) {
-    $scope.products = res.products.data;
-  });
+  $scope.pagination = {};
+
+  $scope.getProducts = function (page) {
+    ProductService.get({
+      page: page
+    }, function (res) {
+      $scope.products = res.products.data;
+      $scope.pagination = {
+        last_page: new Array(res.products.last_page),
+        currentPage: res.products.current_page
+      };
+    });
+  };
+
+  $scope.getProducts(1);
 });
 APP.controller('ProductShowController', function ($scope, ProductService, $stateParams) {
   $scope.product = {};
@@ -240,15 +247,15 @@ APP.controller('ProductEditController', function ($scope, ProductService, $state
   $scope.text = !isEdit ? 'Create ' : 'edit ';
   $scope.files = [];
 
-  $scope.uploadFiles = function (files) {
+  $scope.uploadFiles = function (files, slug) {
     if (files && files.length) {
-      Upload.upload({
+      return Upload.upload({
         url: 'api/products/images',
         data: {
           file: files,
-          slug: $stateParams.slug
+          slug: slug
         }
-      }).then(function (res) {});
+      });
     }
   };
 
@@ -270,7 +277,7 @@ APP.controller('ProductEditController', function ($scope, ProductService, $state
 
   $scope.save = function () {
     if (isEdit) {
-      $scope.uploadFiles($scope.file);
+      $scope.uploadFiles($scope.file, $stateParams.slug);
       ProductService.update({
         slug: $stateParams.slug
       }, $scope.product, function (res) {
@@ -278,7 +285,9 @@ APP.controller('ProductEditController', function ($scope, ProductService, $state
       });
     } else {
       ProductService.store($scope.product, function (res) {
-        $state.go('products');
+        $scope.uploadFiles($scope.files, res.slug).then(function () {
+          $state.go('products');
+        });
       });
     }
   };

@@ -1,22 +1,22 @@
 APP.controller('AuthLoginController', function ($scope, AuthService, toastr, $state) {
-	$scope.user = {
-		email: null,
-		password: null
-	};
+    $scope.user = {
+        email    : null,
+        password : null
+    };
 
-	$scope.login = function () {
-		AuthService.login($scope.user, (res) => {
-			if(res.access_token) {
-				localStorage.setItem('api_token', res.access_token);
-				$state.go('/');
-			}
+    $scope.login = function () {
+        AuthService.login($scope.user, (res) => {
+            if(res.access_token) {
+                localStorage.setItem('api_token', res.access_token);
+                $state.go('/');
+            }
 
-		}, (err) => {
-			if(err.status === 401) {
-				toastr.error('Email or Password incorrect!');
-			}
-		});
-	}
+        }, (err) => {
+            if(err.status === 401) {
+                toastr.error('Email or Password incorrect.');
+            }
+        });
+    }
 });
 
 
@@ -61,11 +61,11 @@ APP.controller('AuthResetController', function($scope, AuthService, $toastr, $st
 	}
 });
 
-APP.controller('AuthVerifyController', function($stateParams, AuthService, toastr, $state) {
-	AuthService.verify({token: $stateParams.token}, () => {
-		toastr.success('You have successfuly verified!');
-		$state.go('login');
-	}, (err) => {
-		$state.go('/');
-	})
+APP.controller('AuthVerifyController', function ($stateParams, AuthService, toastr, $state) {
+    AuthService.verify({token :  $stateParams.token}, () => {
+        toastr.success('You have successfully verified.');
+        $state.go('login');
+    }, (err) => {
+        $state.go('/');
+    })
 });

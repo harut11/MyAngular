@@ -38,6 +38,13 @@ class Product extends Model
      */
     public function categoty()
     {
-    	return $this->BelongsTo(Category::class, 'category_id', 'id');
+    	return $this->belongsTo(Category::class, 'category_id', 'id');
     }
-}
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class, 'product_id', 'id');
+    }

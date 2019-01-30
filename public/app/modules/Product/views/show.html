@@ -2,6 +2,7 @@
     <h5 class="card-header">{{ product.name }} ({{ product.category.name}})</h5>
     <div class="card-body">
         <h5 class="card-title">{{ product.short_description }}</h5>
+        <img src="{{'storage/products/'+ image.name}}" alt="" class="img-thumbnail" ng-repeat="image in product.images">
         <p class="card-text">
             {{ product.description }}
         </p>

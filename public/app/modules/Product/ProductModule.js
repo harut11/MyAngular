@@ -1,9 +1,18 @@
 APP.controller('ProductIndexController', function($scope, ProductService) {
 	$scope.products = [];
+	$scope.pagination = {};
 
-	ProductService.get({page : 1}, (res) => {
-		$scope.products = res.products.data;
-	})
+	$scope.getProducts = function(page) {
+		ProductService.get({page: page}, (res) => {
+			$scope.products = res.products.data;
+
+			$scope.pagination = {
+				last_page   : new Array(res.products.last_page),
+				currentPage : res.products.current_page
+			}
+		})
+	}
+	$scope.getProducts(1);
 });
 
 APP.controller('ProductShowController', function($scope, ProductService, $stateParams) {
@@ -19,19 +28,17 @@ APP.controller('ProductEditController', function($scope, ProductService, $stateP
 	$scope.text = !isEdit ? 'Create ' : 'edit ';
 	$scope.files = [];
 
-	$scope.uploadFiles = function (files) {
+	$scope.uploadFiles = function (files, slug) {
 		if(files && files.length) {
-			Upload.upload({
+			return Upload.upload({
 				url: 'api/products/images',
 				data: {
 					file: files,
-					slug: $stateParams.slug
+					slug: slug
 				}
-			}).then((res) => {
-
 			});
 		}
-	}
+	};
 
 	$scope.categories = [];
 
@@ -51,13 +58,15 @@ APP.controller('ProductEditController', function($scope, ProductService, $stateP
 
 	$scope.save = function() {
 		if(isEdit) {
-			$scope.uploadFiles($scope.file);
+			$scope.uploadFiles($scope.file, $stateParams.slug);
 			ProductService.update({slug: $stateParams.slug}, $scope.product, (res) => {
 				$state.go('products');
 			})
 		} else {
 			ProductService.store($scope.product, (res) => {
-				$state.go('products');
+				$scope.uploadFiles($scope.files, res.slug).then(() => {
+					$state.go('products');
+				});
 			})
 		}
 	}

@@ -54,9 +54,9 @@ class ProductController extends Controller
         ]);
 
         $data = $data + ['creator_id' => auth()->id()];
-        Product::query()->create($data);
+        $product = Product::query()->create($data);
 
-        return response()->json(['message' => 'success'], 201);
+        return response()->json(['message' => 'success', 'slug' => $product->slug], 201);
     }
 
     /**
@@ -69,7 +69,7 @@ class ProductController extends Controller
     {
         $product = Product::query()
             ->select('*')
-            ->with(['user', 'category'])
+            ->with(['user', 'category', 'images'])
             ->whereSlug($slug)
             ->first();
 
@@ -117,8 +117,12 @@ class ProductController extends Controller
      */
     public function destroy($slug)
     {
-        Product::query()->whereSlug($slug)->delete();
+        $product = Product::query()->whereSlug($slug)->with('images')->first();
+        foreach ($product->images as $image) {
+            Storage::delete('public/products ' . $image->name);
+        }
 
+        $product->delete();
         return response()->json(['message' => 'seccess'], 204);
     }
 
