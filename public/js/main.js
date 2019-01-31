@@ -1,4 +1,7 @@
 var APP = angular.module('app', ['ui.router', 'ngResource', 'ngAnimate', 'toastr', 'angular-jwt', 'ngFileUpload']);
+APP.config(["$locationProvider", function ($locationProvider) {
+  $locationProvider.html5Mode(true);
+}]);
 APP.config(function Config(toastrConfig, jwtOptionsProvider, $httpProvider) {
   angular.extend(toastrConfig, {
     allowHtml: true,
