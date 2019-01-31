@@ -119,7 +119,7 @@ class ProductController extends Controller
     {
         $product = Product::query()->whereSlug($slug)->with('images')->first();
         foreach ($product->images as $image) {
-            Storage::delete('public/products ' . $image->name);
+            Storage::delete('public/products/' . $image->name);
         }
 
         $product->delete();

@@ -24,6 +24,11 @@ APP.factory('AuthService', ['$resource', function($resource) {
             url : '/api/auth/verify',
             method: 'POST',
             skipAuthorization: true,
-        }
+        },
+        adminLogin : {
+          url : '/api/auth/adminLogin',
+          method : 'POST',
+          skipAuthorization : true
+        },
     });
 }]);

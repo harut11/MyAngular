@@ -36,7 +36,7 @@ class Product extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function categoty()
+    public function category()
     {
     	return $this->belongsTo(Category::class, 'category_id', 'id');
     }
@@ -48,3 +48,4 @@ class Product extends Model
     {
         return $this->hasMany(ProductImage::class, 'product_id', 'id');
     }
+}

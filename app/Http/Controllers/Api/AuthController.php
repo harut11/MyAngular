@@ -20,7 +20,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'reset', 'setPassword', 'verify']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'reset', 'setPassword', 'verify', 'adminLogin']]);
     }
 
     /**
@@ -179,5 +179,16 @@ class AuthController extends Controller
         $info->delete();
 
         return response()->json(['message' => 'success'], 201);
+    }
+
+    public function adminLogin(Request $request)
+    {
+        $credentials = request(['email', 'password']);
+        $credentials = $credentials + ['is_admin' => true];
+
+        if(!$token = auth()->attempt($credentials)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        return $this->respondWithToken($token);
     }
 }

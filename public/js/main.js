@@ -13,8 +13,12 @@ APP.config(function Config(toastrConfig, jwtOptionsProvider, $httpProvider) {
   });
   jwtOptionsProvider.config({
     unauthenticatedRedirectPath: '/login',
-    tokenGetter: [function () {
-      return localStorage.getItem('api_token');
+    tokenGetter: ['options', function (options) {
+      if (options && options.url.indexOf('/admin') > -1) {
+        return localStorage.getItem('api_admin_token');
+      } else {
+        return localStorage.getItem('api_token');
+      }
     }]
   });
   $httpProvider.interceptors.push('jwtInterceptor');
@@ -27,10 +31,18 @@ APP.run(function ($rootScope, $state, authManager, $transitions) {
     alert('Your token is expired.');
   });
   $transitions.onEnter({}, function (transition, state) {
-    if (state.data && state.data.requiresLogin === false) {
-      var token = localStorage.getItem('api_token');
+    if (state.data && state.data.isAdmin && state.data.requiresAdminLogin === false) {
+      var token = localStorage.getItem('api_admin_token');
 
       if (token !== null) {
+        return transition.router.stateService.target('dashboard');
+      }
+    }
+
+    if (state.data && state.requiresLogin === false) {
+      var _token = localStorage.getItem('api_token');
+
+      if (_token !== null) {
         return transition.router.stateService.target('/');
       }
     }
@@ -87,6 +99,11 @@ APP.factory('AuthService', ['$resource', function ($resource) {
       url: '/api/auth/verify',
       method: 'POST',
       skipAuthorization: true
+    },
+    adminLogin: {
+      url: '/api/auth/adminLogin',
+      method: 'POST',
+      skipAuthorization: true
     }
   });
 }]);
@@ -118,9 +135,6 @@ APP.factory('ProductService', ['$resource', function ($resource) {
     get: {
       method: 'GET'
     },
-    edit: {
-      method: 'GET'
-    },
     update: {
       method: 'PUT'
     },
@@ -143,6 +157,26 @@ APP.controller('HeaderController', function ($scope, $state, authManager) {
   };
 });
 APP.controller('AboutIndexController', function () {});
+APP.controller('AdminAuthController', function ($scope, $stateParams, AuthService, toastr, $state) {
+  $scope.admin = {
+    email: null,
+    password: null
+  };
+
+  $scope.login = function () {
+    AuthService.adminLogin($scope.admin, function (res) {
+      if (res.access_token) {
+        localStorage.setItem('api_admin_token', res.access_token);
+        $state.go('dashboard');
+      }
+    }, function (err) {
+      if (err.status === 401) {
+        toastr.error('Email or Password incorrect.');
+      }
+    });
+  };
+});
+APP.controller('AdminDashboardController', function ($scope, $stateParams, toastr, AuthService, $state) {});
 APP.controller('AuthLoginController', function ($scope, AuthService, toastr, $state) {
   $scope.user = {
     email: null,
@@ -316,6 +350,36 @@ APP.config(function ($stateProvider) {
     },
     data: {
       requiresLogin: true
+    }
+  });
+});
+APP.config(function ($stateProvider) {
+  $stateProvider.state('admin', {
+    url: '/admin',
+    views: {
+      'content@': {
+        templateUrl: 'app/modules/Admin/Auth/views/login.html',
+        controller: 'AdminAuthController'
+      }
+    },
+    data: {
+      isAdmin: true,
+      requiresAdminLogin: false
+    }
+  });
+});
+APP.config(function ($stateProvider) {
+  $stateProvider.state('dashboard', {
+    url: '/admin/dashboard',
+    views: {
+      'content@': {
+        templateUrl: 'app/modules/Admin/Dashboard/views/index.html',
+        controller: 'AdminDashboardController'
+      }
+    },
+    data: {
+      requiresAdminLogin: true,
+      isAdmin: true
     }
   });
 });

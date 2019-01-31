@@ -16,8 +16,12 @@ APP.config(function Config(toastrConfig, jwtOptionsProvider, $httpProvider) {
 
     jwtOptionsProvider.config({
         unauthenticatedRedirectPath: '/login',
-        tokenGetter: [function() {
-            return localStorage.getItem('api_token');
+        tokenGetter: ['options', function(options) {
+            if(options && options.url.indexOf('/admin') > -1) {
+                return localStorage.getItem('api_admin_token');
+            } else {
+                return localStorage.getItem('api_token');
+            }
         }]
     });
 
@@ -34,13 +38,21 @@ APP.run(function ($rootScope, $state, authManager, $transitions) {
     });
 
     $transitions.onEnter({}, function (transition, state) {
-    	if (state.data && state.data.requiresLogin === false) {
-    		const token = localStorage.getItem('api_token');
+    	if (state.data && state.data.isAdmin && state.data.requiresAdminLogin === false) {
+    		let token = localStorage.getItem('api_admin_token');
 
     		if (token !== null) {
-    			return transition.router.stateService.target('/');
+    			return transition.router.stateService.target('dashboard');
     		}
     	}
+
+        if(state.data && state.requiresLogin === false) {
+            let token = localStorage.getItem('api_token');
+
+            if(token !== null) {
+                return transition.router.stateService.target('/');
+            }
+        }
     });
 });
 
