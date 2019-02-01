@@ -16,12 +16,17 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Raleway", sans-serif}
 <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
 
 <!-- !PAGE CONTENT! -->
-<div class="w3-main" style="margin-left:300px">
+<div class="w3-main" style="margin-left:200px">
 
-  <div class="w3-container mb-5">
-    <h1><b>Dashboard</b></h1>
-  </div>
-
+  <section class="bg-white p-5">
+    <div class="alert alert-danger" role="alert">
+        Are you sure to delete this product?
+    </div>
+    <div class="text-right">
+        <a class="btn btn-danger text-white" ng-click="delete()">YES</a>
+        <a ui-sref="products" class="btn btn-info text-white">NO</a>
+    </div>
+</section>
 <!-- End page content -->
 </div>
 

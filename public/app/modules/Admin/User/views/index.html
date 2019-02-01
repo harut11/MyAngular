@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<title>W3.CSS Template</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+body,h1,h2,h3,h4,h5,h6 {font-family: "Raleway", sans-serif}
+
+.page-item.active .page-link {
+	background-color: #009688;
+    border-color: #009688;
+}
+
+</style>
+<body class="w3-light-grey w3-content">
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:200px">
+
+  <div class="w3-container mb-5">
+    <h1><b>Users</b></h1>
+  </div>
+  
+ 
+  <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col" width="20%">Name</th>
+            <th scope="col" width="20%">Email</th>
+            <th scope="col" width="20%">Created at</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="user in users">
+            <td>{{ user.id }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.created_at }}</td>
+            <td class="text-right">
+                <div class="btn btn-danger" ui-sref="users.delete({id : user.id})"><i class="fas fa-trash-alt"></i></div>
+                <!-- <a class="btn btn-success" ui-sref="products.edit({slug : product.slug})">EDIT</a>
+                <a class="btn btn-info text-white" ui-sref="products.show({slug : product.slug})">SHOW</a> -->
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center mt-5">
+            <li class="page-item"
+                ng-repeat="(key, page) in pagination.last_page track by key"
+                ng-class='(key + 1) == pagination.currentPage ? "active" : "" '
+            >
+                <a class="page-link ac"
+                   href="#"
+                   ng-click="getUsers((key + 1))">{{key + 1}}</a>
+            </li>
+        </ul>
+    </nav>
+
+<!-- End page content -->
+</div>
+
+<script>
+// Script to open and close sidebar
+function w3_open() {
+    document.getElementById("mySidebar").style.display = "block";
+    document.getElementById("myOverlay").style.display = "block";
+}
+ 
+function w3_close() {
+    document.getElementById("mySidebar").style.display = "none";
+    document.getElementById("myOverlay").style.display = "none";
+}
+</script>
+
+</body>
+</html>

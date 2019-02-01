@@ -4,6 +4,6 @@ APP.factory('CategoryService', ['$resource', function($resource) {
 		update  : {method : 'PUT'},
 		store   : {method : 'POST'},
 		show    : {method : 'GET'},
-		delete  : {method : 'DELETE'}
+		delete  : {method : 'DELETE'},
 	});
 }]);
