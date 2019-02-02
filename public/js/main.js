@@ -201,9 +201,6 @@ APP.controller('AdminAuthController', function ($scope, $stateParams, AuthServic
 APP.controller('AdminCategoryController', function ($scope, $stateParams, AuthService, $state, CategoryService) {
   $scope.categories = [];
   $scope.pagination = {};
-  CategoryService.get({}, function (res) {
-    $scope.categories = res.categories;
-  });
 
   $scope.getCategory = function (page) {
     CategoryService.get({
