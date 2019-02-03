@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserRequest;
 use App\Models\User;
 
 class UserController extends Controller
@@ -53,7 +54,12 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        $users = User::query()
+            ->select('id', 'name', 'email', 'created_at')
+            ->whereId($id)
+            ->first();
+
+        return response()->json(['user' => $users]);
     }
 
     /**
@@ -74,9 +80,16 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UserRequest $request, $id)
     {
-        //
+        User::query()
+            ->whereId($id)
+            ->update($request->only([
+                'name',
+                'email'
+            ]));
+
+        return response()->json(['message' => 'success'], 204);
     }
 
     /**
@@ -87,6 +100,7 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        User::query()->whereId($id)->first()->delete();
+        return response()->json(['messsage' => 'success', 204]);
     }
 }

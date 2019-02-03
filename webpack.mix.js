@@ -23,7 +23,7 @@ mix.js('resources/js/app.js', 'public/js')
 	], 'public/js/angular.js')
 	.babel([
 		'public/app/main.js',
-		'public/app/services/*Service.js',
+		'public/app/services/**/*Service.js',
 		'public/app/modules/**/*Module.js',
 		'public/app/modules/**/*State.js',
 	], 'public/js/main.js')

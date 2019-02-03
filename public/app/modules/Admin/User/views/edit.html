@@ -1,0 +1,32 @@
+<body class="w3-light-grey w3-content">
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:200px">
+
+  <div class="w3-container mb-5">
+    <h1><b>User Edit</b></h1>
+  </div>
+  
+ 
+  <form ng-submit="save()">
+        
+        <div class="form-group">
+            <label>Name</label>
+            <input type="text" class="form-control" placeholder="Enter name" ng-model="users.name">
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="form-control" ng-model="users.email" placeholder="Enter email">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Edit</button>
+    </form>
+<!-- End page content -->
+</div>
+<style>
+body,h1,h2,h3,h4,h5,h6 {font-family: "Raleway", sans-serif}
+</style>
+</body>

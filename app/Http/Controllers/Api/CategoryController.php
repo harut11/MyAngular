@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
 use App\Http\Controllers\Controller;
 
@@ -34,9 +35,15 @@ class CategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
-        //
+       $data = $request->only([
+            'name'
+        ]);
+
+        $category = Category::query()->create($data);
+
+        return response()->json(['message' => 'success', 'slug' => $category->slug], 201);
     }
 
     /**
@@ -47,7 +54,7 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        //
+        
     }
 
     /**
@@ -68,9 +75,19 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $slug)
     {
-        //
+        $this->validate($request, [
+            'name' => 'required|min:2|max:20|string'
+        ]);
+
+        $data = Category::query()
+            ->whereSlug($slug)
+            ->update($request->only([
+                'name'
+            ]));
+
+        return response()->json(['message' => 'success'], 204);
     }
 
     /**
@@ -79,8 +96,9 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($slug)
     {
-        //
+        Category::query()->whereSlug($slug)->first()->delete();
+        return response()->json(['messsage' => 'success', 204]);
     }
 }

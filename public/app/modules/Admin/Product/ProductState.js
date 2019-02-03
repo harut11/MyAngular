@@ -17,6 +17,23 @@ APP.config(function($stateProvider) {
                 isAdmin : true
             }
         })
+        .state('product.show',{
+            url : '/:slug/show',
+            views : {
+                'content@' : {
+                    templateUrl : 'app/modules/Admin/Product/views/show.html',
+                    controller : 'AdminProductShowController'
+                },
+                'header@' : {
+                    templateUrl : 'app/modules/Admin/_layouts/views/sidebar.html',
+                    controller : 'AdminSidebarController'
+                }
+            },
+            data: {
+                requiresAdminLogin : true,
+                isAdmin : true
+            }
+        })
         .state('product.edit',{
             url : '/:slug/edit',
             views : {

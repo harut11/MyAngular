@@ -1,0 +1,37 @@
+<body class="w3-light-grey w3-content">
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:200px">
+
+  <div class="w3-container mb-5">
+    <h1><b>Users</b></h1>
+  </div>
+ 
+  <div class="card">
+    <h5 class="card-header">Person</h5>
+    <div class="card-body">
+        <p class="card-title" ng-model="users.name"><strong>User Name:</strong> {{ user.name }}<p>
+        <p class="card-text">
+            <strong>User Email:</strong> {{ user.email }}
+        </p>
+        <p><strong>Create At: </strong>{{ user.created_at }}</p>
+        <a ui-sref="user.edit({id : user.id})"  class="btn btn-primary text-white"><i class="fas fa-edit"></i></a>
+        <a ui-sref="user.delete({id : user.id})"  class="btn btn-danger text-white"><i class="fas fa-trash-alt"></i></a>
+    </div>
+</div>
+
+<!-- End page content -->
+</div>
+</body>
+<style>
+body,h1,h2,h3,h4,h5,h6 {font-family: "Raleway", sans-serif}
+
+.page-item.active .page-link {
+    background-color: #009688;
+    border-color: #009688;
+}
+
+</style>

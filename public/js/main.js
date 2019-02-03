@@ -71,6 +71,69 @@ APP.factory('errorInterceptors', ['$injector', function ($injector) {
 APP.config(['$httpProvider', function ($httpProvider) {
   $httpProvider.interceptors.push('errorInterceptors');
 }]);
+APP.factory('CategoryService', ['$resource', function ($resource) {
+  return $resource('/api/admin/categories/:slug', {
+    slug: '@slug'
+  }, {
+    get: {
+      method: 'GET'
+    },
+    update: {
+      method: 'PUT'
+    },
+    store: {
+      method: 'POST'
+    },
+    show: {
+      method: 'GET'
+    },
+    delete: {
+      method: 'DELETE'
+    }
+  });
+}]);
+APP.factory('ProductService', ['$resource', function ($resource) {
+  return $resource('api/admin/products/:slug', {
+    slug: '@slug'
+  }, {
+    get: {
+      method: 'GET'
+    },
+    update: {
+      method: 'PUT'
+    },
+    store: {
+      method: 'POST'
+    },
+    show: {
+      method: 'GET'
+    },
+    delete: {
+      method: 'DELETE'
+    }
+  });
+}]);
+APP.factory('UserService', ['$resource', function ($resource) {
+  return $resource('/api/admin/users/:id', {
+    id: '@id'
+  }, {
+    get: {
+      method: 'GET'
+    },
+    update: {
+      method: 'PUT'
+    },
+    store: {
+      method: 'POST'
+    },
+    show: {
+      method: 'GET'
+    },
+    delete: {
+      method: 'DELETE'
+    }
+  });
+}]);
 APP.factory('AuthService', ['$resource', function ($resource) {
   return $resource('/api/auth/:id', {
     id: '@id'
@@ -107,70 +170,19 @@ APP.factory('AuthService', ['$resource', function ($resource) {
     }
   });
 }]);
-APP.factory('CategoryService', ['$resource', function ($resource) {
-  return $resource('/api/categories/:slug', {
+APP.factory('UserProductService', ['$resource', function ($resource) {
+  return $resource('api/products/:slug', {
     slug: '@slug'
   }, {
     get: {
       method: 'GET'
     },
-    update: {
-      method: 'PUT'
-    },
-    store: {
-      method: 'POST'
-    },
     show: {
       method: 'GET'
-    },
-    delete: {
-      method: 'DELETE'
     }
   });
 }]);
-APP.factory('ProductService', ['$resource', function ($resource) {
-  return $resource('/api/products/:slug', {
-    slug: '@slug'
-  }, {
-    get: {
-      method: 'GET'
-    },
-    update: {
-      method: 'PUT'
-    },
-    store: {
-      method: 'POST'
-    },
-    show: {
-      method: 'GET'
-    },
-    delete: {
-      method: 'DELETE'
-    }
-  });
-}]);
-APP.factory('UserService', ['$resource', function ($resource) {
-  return $resource('/api/users/:id', {
-    id: '@id'
-  }, {
-    get: {
-      method: 'GET'
-    },
-    update: {
-      method: 'PUT'
-    },
-    store: {
-      method: 'POST'
-    },
-    show: {
-      method: 'GET'
-    },
-    delete: {
-      method: 'DELETE'
-    }
-  });
-}]);
-APP.controller('HeaderController', function ($scope, $state, authManager) {
+APP.controller('HeaderController', function ($scope, $state, authManager, $rootScope) {
   $scope.logout = function ($event) {
     $event.preventDefault();
     localStorage.removeItem('api_token');
@@ -178,7 +190,14 @@ APP.controller('HeaderController', function ($scope, $state, authManager) {
   };
 });
 APP.controller('AboutIndexController', function () {});
-APP.controller('AdminSidebarController', function () {});
+APP.controller('AdminSidebarController', function ($scope, $state, authManager) {
+  $scope.logout = function ($event) {
+    $event.preventDefault();
+    localStorage.removeItem('api_admin_token');
+    authManager.unauthenticate();
+    $state.go('/');
+  };
+});
 APP.controller('AdminAuthController', function ($scope, $stateParams, AuthService, toastr, $state) {
   $scope.admin = {
     email: null,
@@ -216,6 +235,46 @@ APP.controller('AdminCategoryController', function ($scope, $stateParams, AuthSe
 
   $scope.getCategory(1);
 });
+APP.controller('AdminCategoryEditController', function ($scope, CategoryService, $stateParams, $state) {
+  var isAdminEdit = $stateParams.slug != 0;
+  $scope.text = !isAdminEdit ? 'Create ' : 'edit ';
+  $scope.categories = {};
+  CategoryService.get({}, function (res) {
+    $scope.categories = res.categories;
+  });
+
+  if (isAdminEdit) {
+    CategoryService.show({
+      slug: $stateParams.slug
+    }, function (res) {
+      $scope.categories = res.categories;
+    });
+  }
+
+  $scope.save = function () {
+    if (isAdminEdit) {
+      CategoryService.update({
+        slug: $stateParams.slug
+      }, $scope.categories, function (res) {
+        $state.go('category');
+      });
+    } else {
+      CategoryService.store($scope.category, function (res) {
+        $state.go('category');
+      });
+    }
+  };
+});
+APP.controller('AdminCategoryDeleteController', function ($scope, CategoryService, $stateParams, $state, toastr) {
+  $scope.delete = function () {
+    CategoryService.delete({
+      slug: $stateParams.slug
+    }, function (res) {
+      $state.go('category');
+      toastr.success('Successfully deleted!');
+    });
+  };
+});
 APP.controller('AdminDashboardController', function ($scope, $stateParams, toastr, AuthService, $state, ProductService, CategoryService) {// $scope.products = [];
   // $scope.pagination = {};
   // $scope.getProducts = function(page) {
@@ -246,6 +305,14 @@ APP.controller('AdminProductController', function ($scope, $stateParams, AuthSer
   };
 
   $scope.getProducts(1);
+});
+APP.controller('AdminProductShowController', function ($scope, ProductService, $stateParams) {
+  $scope.product = {};
+  ProductService.show({
+    slug: $stateParams.slug
+  }, function (res) {
+    $scope.product = res.product;
+  });
 });
 APP.controller('AdminProductEditController', function ($scope, ProductService, $stateParams, CategoryService, $state, Upload) {
   var isAdminEdit = $stateParams.slug != 0;
@@ -324,6 +391,53 @@ APP.controller('AdminUserController', function ($scope, $stateParams, AuthServic
 
   $scope.getUsers(1);
 });
+APP.controller('AdminUserShowController', function ($scope, UserService, $stateParams) {
+  $scope.user = {};
+  UserService.show({
+    id: $stateParams.id
+  }, function (res) {
+    $scope.user = res.user;
+  });
+});
+APP.controller('AdminUserEditController', function ($scope, UserService, $stateParams, $state) {
+  var isAdminEdit = $stateParams.slug != 0;
+  $scope.text = !isAdminEdit ? 'Create ' : 'edit ';
+  UserService.get({}, function (res) {
+    $scope.users = res.users;
+  });
+
+  if (isAdminEdit) {
+    UserService.show({
+      id: $stateParams.id
+    }, function (res) {
+      $scope.user = res.user;
+    });
+  }
+
+  $scope.save = function () {
+    if (isAdminEdit) {
+      UserService.update({
+        id: $stateParams.id
+      }, $scope.users, function (res) {
+        $state.go('user');
+      });
+    } else {
+      UserService.store($scope.users, function (res) {
+        $state.go('user');
+      });
+    }
+  };
+});
+APP.controller('AdminUserDeleteController', function ($scope, UserService, $stateParams, $state, toastr) {
+  $scope.delete = function () {
+    UserService.delete({
+      id: $stateParams.id
+    }, function (res) {
+      $state.go('user');
+      toastr.success('Successfully deleted!');
+    });
+  };
+});
 APP.controller('AuthLoginController', function ($scope, AuthService, toastr, $state) {
   $scope.user = {
     email: null,
@@ -399,16 +513,18 @@ APP.controller('AuthVerifyController', function ($stateParams, AuthService, toas
     $state.go('/');
   });
 });
-APP.controller('HomeIndexController', function () {});
-APP.controller('ProductIndexController', function ($scope, ProductService) {
+APP.controller('HomeIndexController', function ($scope, UserProductService, $rootScope) {
   $scope.products = [];
   $scope.pagination = {};
+  $scope.image = {};
+  $rootScope.cartItems = [];
 
   $scope.getProducts = function (page) {
-    ProductService.get({
+    UserProductService.get({
       page: page
     }, function (res) {
       $scope.products = res.products.data;
+      $scope.image = res.image;
       $scope.pagination = {
         last_page: new Array(res.products.last_page),
         currentPage: res.products.current_page
@@ -417,73 +533,15 @@ APP.controller('ProductIndexController', function ($scope, ProductService) {
   };
 
   $scope.getProducts(1);
-});
-APP.controller('ProductShowController', function ($scope, ProductService, $stateParams) {
-  $scope.product = {};
-  ProductService.show({
-    slug: $stateParams.slug
-  }, function (res) {
-    $scope.product = res.product;
-  });
-});
-APP.controller('ProductEditController', function ($scope, ProductService, $stateParams, CategoryService, $state, Upload) {
-  var isEdit = $stateParams.slug != 0;
-  $scope.text = !isEdit ? 'Create ' : 'edit ';
-  $scope.files = [];
 
-  $scope.uploadFiles = function (files, slug) {
-    if (files && files.length) {
-      return Upload.upload({
-        url: 'api/products/images',
-        data: {
-          file: files,
-          slug: slug
-        }
-      });
-    }
-  };
-
-  $scope.categories = [];
-  $scope.product = {
-    category_id: ''
-  };
-  CategoryService.get({}, function (res) {
-    $scope.categories = res.categories;
-  });
-
-  if (isEdit) {
-    ProductService.show({
-      slug: $stateParams.slug
+  $scope.addCart = function (slug) {
+    UserProductService.show({
+      slug: slug
     }, function (res) {
-      $scope.product = res.product;
+      $rootScope.cartItems.push(res.product);
+      console.log(res);
     });
-  }
-
-  $scope.save = function () {
-    if (isEdit) {
-      $scope.uploadFiles($scope.file, $stateParams.slug);
-      ProductService.update({
-        slug: $stateParams.slug
-      }, $scope.product, function (res) {
-        $state.go('products');
-      });
-    } else {
-      ProductService.store($scope.product, function (res) {
-        $scope.uploadFiles($scope.files, res.slug).then(function () {
-          $state.go('products');
-        });
-      });
-    }
-  };
-});
-APP.controller('ProductDeleteController', function ($scope, ProductService, $stateParams, $state, toastr) {
-  $scope.delete = function () {
-    ProductService.delete({
-      slug: stateParams.slug
-    }, function (res) {
-      $state.go('products');
-      toastr.success('Successfully deleted!');
-    });
+    console.log($rootScope.cartItems);
   };
 });
 APP.config(function ($stateProvider) {
@@ -602,6 +660,22 @@ APP.config(function ($stateProvider) {
       requiresAdminLogin: true,
       isAdmin: true
     }
+  }).state('product.show', {
+    url: '/:slug/show',
+    views: {
+      'content@': {
+        templateUrl: 'app/modules/Admin/Product/views/show.html',
+        controller: 'AdminProductShowController'
+      },
+      'header@': {
+        templateUrl: 'app/modules/Admin/_layouts/views/sidebar.html',
+        controller: 'AdminSidebarController'
+      }
+    },
+    data: {
+      requiresAdminLogin: true,
+      isAdmin: true
+    }
   }).state('product.edit', {
     url: '/:slug/edit',
     views: {
@@ -643,6 +717,38 @@ APP.config(function ($stateProvider) {
       'content@': {
         templateUrl: 'app/modules/Admin/User/views/index.html',
         controller: 'AdminUserController'
+      },
+      'header@': {
+        templateUrl: 'app/modules/Admin/_layouts/views/sidebar.html',
+        controller: 'AdminSidebarController'
+      }
+    },
+    data: {
+      requiresAdminLogin: true,
+      isAdmin: true
+    }
+  }).state('user.show', {
+    url: '/:id/show',
+    views: {
+      'content@': {
+        templateUrl: 'app/modules/Admin/User/views/show.html',
+        controller: 'AdminUserShowController'
+      },
+      'header@': {
+        templateUrl: 'app/modules/Admin/_layouts/views/sidebar.html',
+        controller: 'AdminSidebarController'
+      }
+    },
+    data: {
+      requiresAdminLogin: true,
+      isAdmin: true
+    }
+  }).state('user.edit', {
+    url: '/:id/edit',
+    views: {
+      'content@': {
+        templateUrl: 'app/modules/Admin/User/views/edit.html',
+        controller: 'AdminUserEditController'
       },
       'header@': {
         templateUrl: 'app/modules/Admin/_layouts/views/sidebar.html',
@@ -743,57 +849,6 @@ APP.config(function ($stateProvider) {
       'footer@': {
         templateUrl: "/app/modules/_layout/views/_footer.html",
         controller: "HomeIndexController"
-      }
-    }
-  });
-});
-APP.config(function ($stateProvider) {
-  $stateProvider.state('products', {
-    url: "/products",
-    views: {
-      'header@': {
-        templateUrl: "/app/modules/_layout/views/_header.html",
-        controller: "HeaderController"
-      },
-      'content@': {
-        templateUrl: "/app/modules/Product/views/index.html",
-        controller: "ProductIndexController"
-      }
-    }
-  }).state('products.show', {
-    url: "/:slug/show",
-    views: {
-      'header@': {
-        templateUrl: "/app/modules/_layout/views/_header.html",
-        controller: "HeaderController"
-      },
-      'content@': {
-        templateUrl: "/app/modules/Product/views/show.html",
-        controller: "ProductShowController"
-      }
-    }
-  }).state('products.edit', {
-    url: "/:slug/edit",
-    views: {
-      'header@': {
-        templateUrl: "/app/modules/_layout/views/_header.html",
-        controller: "HeaderController"
-      },
-      'content@': {
-        templateUrl: "/app/modules/Product/views/edit.html",
-        controller: "ProductEditController"
-      }
-    }
-  }).state('products.delete', {
-    url: "/:slug/delete",
-    views: {
-      'header@': {
-        templateUrl: "/app/modules/_layout/views/_header.html",
-        controller: "HeaderController"
-      },
-      'content@': {
-        templateUrl: "/app/modules/Product/views/delete.html",
-        controller: "ProductDeleteController"
       }
     }
   });

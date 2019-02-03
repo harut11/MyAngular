@@ -1,0 +1,40 @@
+<body class="w3-light-grey w3-content">
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:200px">
+
+  <div class="w3-container mb-5">
+    <h1><b>Products</b></h1>
+  </div>
+ 
+  	<div class="card">
+	    <h5 class="card-header">{{ product.name }} ({{ product.category.name}})</h5>
+	    <div class="card-body">
+	        <h5 class="card-title">{{ product.short_description }}</h5>
+	        <img src="{{'storage/products/'+ image.name}}" alt="" class="img-thumbnail" ng-repeat="image in product.images">
+	        <p class="card-text">
+	            {{ product.description }}
+	        </p>
+	        <p><strong>Price: </strong>{{ product.price }}$</p>
+	        <p><strong>Created by: </strong>{{ product.user.name }}</p>
+	        <p><strong>Create At: </strong>{{ product.created_at }}</p>
+	        <a ui-sref="products.edit({slug : product.slug})"  class="btn btn-primary"><i class="fas fa-edit"></i></a>
+	        <a ui-sref="products.delete({slug : product.slug})"  class="btn btn-danger"><i class="fas fa-trash-alt"></i></a>
+	    </div>
+	</div>
+
+<!-- End page content -->
+</div>
+</body>
+<style>
+body,h1,h2,h3,h4,h5,h6 {font-family: "Raleway", sans-serif}
+
+.page-item.active .page-link {
+    background-color: #009688;
+    border-color: #009688;
+}
+
+</style>

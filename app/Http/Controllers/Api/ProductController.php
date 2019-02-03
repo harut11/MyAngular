@@ -21,10 +21,15 @@ class ProductController extends Controller
     {
         $data = Product::query()
             ->select('id', 'name', 'slug', 'price', 'short_description')
+            ->with('images')
             ->orderBy('name', 'ASC')
-            ->paginate(20);
+            ->paginate(21);
 
-        return response()->json(['products' => $data]);
+        $general = ProductImage::query()
+            ->where('is_general', '=', 1)
+            ->first();
+
+        return response()->json(['products' => $data, 'image' => $general]);
     }
 
     /**

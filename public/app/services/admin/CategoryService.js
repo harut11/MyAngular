@@ -1,5 +1,5 @@
 APP.factory('CategoryService', ['$resource', function($resource) {
-	return $resource('/api/categories/:slug', {slug: '@slug'}, {
+	return $resource('/api/admin/categories/:slug', {slug: '@slug'}, {
 		get     : {method : 'GET'},
 		update  : {method : 'PUT'},
 		store   : {method : 'POST'},

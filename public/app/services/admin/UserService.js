@@ -1,5 +1,5 @@
 APP.factory('UserService', ['$resource', function($resource) {
-	return $resource('/api/users/:id', {id: '@id'}, {
+	return $resource('/api/admin/users/:id', {id: '@id'}, {
 		get     : {method : 'GET'},
 		update  : {method : 'PUT'},
         store   : {method : 'POST'},

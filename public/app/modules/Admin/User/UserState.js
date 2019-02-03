@@ -17,6 +17,40 @@ APP.config(function($stateProvider) {
                 isAdmin : true
             }
         })
+        .state('user.show',{
+            url : '/:id/show',
+            views : {
+                'content@' : {
+                    templateUrl : 'app/modules/Admin/User/views/show.html',
+                    controller : 'AdminUserShowController'
+                },
+                'header@' : {
+                    templateUrl : 'app/modules/Admin/_layouts/views/sidebar.html',
+                    controller : 'AdminSidebarController'
+                }
+            },
+            data: {
+                requiresAdminLogin : true,
+                isAdmin : true
+            }
+        })
+        .state('user.edit',{
+            url : '/:id/edit',
+            views : {
+                'content@' : {
+                    templateUrl : 'app/modules/Admin/User/views/edit.html',
+                    controller : 'AdminUserEditController'
+                },
+                'header@' : {
+                    templateUrl : 'app/modules/Admin/_layouts/views/sidebar.html',
+                    controller : 'AdminSidebarController'
+                }
+            },
+            data: {
+                requiresAdminLogin : true,
+                isAdmin : true
+            }
+        })
         .state('user.delete',{
             url : '/:id/delete',
             views : {

@@ -15,8 +15,16 @@ APP.controller('AdminProductController',function($scope, $stateParams, AuthServi
 	$scope.getProducts(1);
 });
 
+APP.controller('AdminProductShowController', function($scope, ProductService, $stateParams) {
+	$scope.product = {};
+
+	ProductService.show({slug : $stateParams.slug}, (res) => {
+		$scope.product = res.product;
+	})
+});
+
 APP.controller('AdminProductEditController', function($scope, ProductService, $stateParams, CategoryService, $state, Upload) {
-	const isAdminEdit = $stateParams.slug != 0;
+	let isAdminEdit = $stateParams.slug != 0;
 	$scope.text = !isAdminEdit ? 'Create ' : 'edit ';
 	$scope.files = [];
 
