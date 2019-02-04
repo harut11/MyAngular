@@ -1,11 +1,11 @@
 <div class="d-flex flex-wrap" style="margin-top:100px;">
     <div class="w3-container w3-card w3-white w3-round w3-margin flex-fill" style="width: 30%;" ng-repeat="product in products"><br>
-        <h4>{{ product.name }}</h4><br>
+        <h4 ui-sref="show({slug : product.slug})" style="cursor:pointer;">{{ product.name }}</h4><br>
         <hr class="w3-clear">
         <img src="{{'storage/products/'+ image.name}}" style="width:100%; height:200px;object-fit:contain;" class="w3-margin-bottom">
         <p>{{ product.short_description }}</p>
-        <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" ng-click="addCart(product.slug)"><i class="fas fa-cart-plus" ng-click="addCart()"></i>  Add to cart</button>
-        <button type="button" class="w3-button w3-theme-d2 w3-margin-bottom"><i class="fas fa-heart"></i>  Add to wish list</button> 
+        <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" ng-click="addCart(product.slug)"><i class="fas fa-cart-plus icon"></i>  Add to cart</button>
+        <button type="button" class="w3-button w3-theme-d2 w3-margin-bottom" ng-click="addWish(product.slug)"><i class="fas fa-heart"></i>  Add to wish list</button> 
     </div>
 </div>
 <!-- Pagination -->

@@ -3,6 +3,9 @@ APP.controller('HomeIndexController', function($scope, UserProductService, $root
 	$scope.pagination = {};
 	$scope.image = {};
 	$rootScope.cartItems = [];
+	$rootScope.cartCount = 0;
+	$rootScope.wishItems = [];
+	$rootScope.wishCount = 0;
 
 	$scope.getProducts = function(page) {
 		UserProductService.get({page: page}, (res) => {
@@ -17,13 +20,29 @@ APP.controller('HomeIndexController', function($scope, UserProductService, $root
 	}
 	$scope.getProducts(1);
 
-	$scope.addCart = function(slug) {
-
+	$rootScope.addCart = function(slug) {
+		
 		UserProductService.show({slug : slug}, (res) => {
 			$rootScope.cartItems.push(res.product);
-			console.log(res);
 		});
 
-		console.log($rootScope.cartItems);
+		$rootScope.cartCount += 1;
 	}
+
+	$rootScope.addWish = function(slug) {
+
+		UserProductService.show({slug : slug}, (res) => {
+			$rootScope.wishItems.push(res.product);
+		});
+
+		$rootScope.wishCount += 1;
+	}
+});
+
+APP.controller('HomeShowController', function($scope, UserProductService, $stateParams) {
+	$scope.product = {};
+
+	UserProductService.show({slug : $stateParams.slug}, (res) => {
+		$scope.product = res.product;
+	})
 });

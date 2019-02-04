@@ -5,4 +5,8 @@ APP.controller('HeaderController', function($scope, $state, authManager, $rootSc
 		authManager.unauthenticate();
 	}
 
+	let count = document.getElementsByClassName('element').length;
+
+	$scope.text = count;
+
 });

@@ -1,5 +1,7 @@
-APP.controller('AdminUserController',function($scope, $stateParams, AuthService,$state, UserService) {
+APP.controller('AdminUserController',function($scope, $stateParams, AuthService,$state, UserService, $rootScope) {
 	$scope.users = [];
+	let count = [];
+	$rootScope.userCount = count.length;
 
 	$scope.getUsers = function(page) {
 		UserService.get({page: page}, (res) => {
@@ -9,7 +11,14 @@ APP.controller('AdminUserController',function($scope, $stateParams, AuthService,
 				last_page   : new Array(res.users.last_page),
 				currentPage : res.users.current_page
 			}
-		})
+		});
+		UserService.get({}, (res) => {
+			let arr = res.users.data,
+				arrlength = arr.length;
+			for(let i = 0; i < arrlength; i++) {
+				count.push(arr[i]);
+			}
+		});
 	}
 	$scope.getUsers(1);
 });

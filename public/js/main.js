@@ -188,6 +188,9 @@ APP.controller('HeaderController', function ($scope, $state, authManager, $rootS
     localStorage.removeItem('api_token');
     authManager.unauthenticate();
   };
+
+  var count = document.getElementsByClassName('element').length;
+  $scope.text = count;
 });
 APP.controller('AboutIndexController', function () {});
 APP.controller('AdminSidebarController', function ($scope, $state, authManager) {
@@ -374,8 +377,10 @@ APP.controller('AdminProductDeleteController', function ($scope, ProductService,
     });
   };
 });
-APP.controller('AdminUserController', function ($scope, $stateParams, AuthService, $state, UserService) {
+APP.controller('AdminUserController', function ($scope, $stateParams, AuthService, $state, UserService, $rootScope) {
   $scope.users = [];
+  var count = [];
+  $rootScope.userCount = count.length;
 
   $scope.getUsers = function (page) {
     UserService.get({
@@ -386,6 +391,14 @@ APP.controller('AdminUserController', function ($scope, $stateParams, AuthServic
         last_page: new Array(res.users.last_page),
         currentPage: res.users.current_page
       };
+    });
+    UserService.get({}, function (res) {
+      var arr = res.users.data,
+          arrlength = arr.length;
+
+      for (var i = 0; i < arrlength; i++) {
+        count.push(arr[i]);
+      }
     });
   };
 
@@ -518,6 +531,9 @@ APP.controller('HomeIndexController', function ($scope, UserProductService, $roo
   $scope.pagination = {};
   $scope.image = {};
   $rootScope.cartItems = [];
+  $rootScope.cartCount = 0;
+  $rootScope.wishItems = [];
+  $rootScope.wishCount = 0;
 
   $scope.getProducts = function (page) {
     UserProductService.get({
@@ -534,15 +550,31 @@ APP.controller('HomeIndexController', function ($scope, UserProductService, $roo
 
   $scope.getProducts(1);
 
-  $scope.addCart = function (slug) {
+  $rootScope.addCart = function (slug) {
     UserProductService.show({
       slug: slug
     }, function (res) {
       $rootScope.cartItems.push(res.product);
-      console.log(res);
     });
-    console.log($rootScope.cartItems);
+    $rootScope.cartCount += 1;
   };
+
+  $rootScope.addWish = function (slug) {
+    UserProductService.show({
+      slug: slug
+    }, function (res) {
+      $rootScope.wishItems.push(res.product);
+    });
+    $rootScope.wishCount += 1;
+  };
+});
+APP.controller('HomeShowController', function ($scope, UserProductService, $stateParams) {
+  $scope.product = {};
+  UserProductService.show({
+    slug: $stateParams.slug
+  }, function (res) {
+    $scope.product = res.product;
+  });
 });
 APP.config(function ($stateProvider) {
   $stateProvider.state('about', {
@@ -845,6 +877,22 @@ APP.config(function ($stateProvider) {
       'content@': {
         templateUrl: "/app/modules/Home/views/index.html",
         controller: "HomeIndexController"
+      },
+      'footer@': {
+        templateUrl: "/app/modules/_layout/views/_footer.html",
+        controller: "HomeIndexController"
+      }
+    }
+  }).state('show', {
+    url: "show/:slug",
+    views: {
+      'header@': {
+        templateUrl: "/app/modules/_layout/views/_header.html",
+        controller: "HeaderController"
+      },
+      'content@': {
+        templateUrl: "/app/modules/Home/views/show.html",
+        controller: "HomeShowController"
       },
       'footer@': {
         templateUrl: "/app/modules/_layout/views/_footer.html",

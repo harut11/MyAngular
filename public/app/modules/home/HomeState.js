@@ -17,4 +17,21 @@ APP.config(function ($stateProvider) {
                 }
             }
         })
+        .state('show', {
+            url: "show/:slug",
+            views: {
+                'header@': {
+                    templateUrl: "/app/modules/_layout/views/_header.html",
+                    controller: "HeaderController"
+                },
+                'content@': {
+                    templateUrl: "/app/modules/Home/views/show.html",
+                    controller: "HomeShowController"
+                },
+                'footer@': {
+                    templateUrl: "/app/modules/_layout/views/_footer.html",
+                    controller: "HomeIndexController"
+                }
+            }
+        })
 })

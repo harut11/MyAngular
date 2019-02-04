@@ -1,0 +1,8 @@
+<div class="container w3-card w3-white w3-round" style="margin-top:100px;margin-bottom:50px;"><br>
+    <h4>{{ product.name }}</h4><br>
+    <hr class="w3-clear">
+    <img src="{{'storage/products/'+ '6.jpg'}}" style="width:70%; height:auto;object-fit:contain;margin: auto;" class="w3-margin-bottom">
+    <p>{{ product.description }}</p>
+    <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" ng-click="addCart(product.slug)"><i class="fas fa-cart-plus icon"></i>  Add to cart</button>
+    <button type="button" class="w3-button w3-theme-d2 w3-margin-bottom" ng-click="addWish(product.slug)"><i class="fas fa-heart"></i>  Add to wish list</button> 
+</div>
